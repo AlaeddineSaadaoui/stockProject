@@ -23,8 +23,8 @@ public class StockService  {
         return stockRepository.findAll();
     }
 
-    public Iterable<StockEntity> save(List<StockEntity> stockList ){
-        return stockRepository.saveAll(stockList);
+    public Iterable<StockEntity> saveAll(List<StockEntity> stockEntityList){
+        return stockRepository.saveAll(stockEntityList);
     }
 
     public StockStats getStockStatsByDate(String stockName, String inputDate){
@@ -34,7 +34,5 @@ public class StockService  {
     public StockStats getStockStatsByMonth(String stockName, String inputMonth){
         return stockRepository.getStockStatsByMonth(stockName,inputMonth);
     }
-
-
 
 }

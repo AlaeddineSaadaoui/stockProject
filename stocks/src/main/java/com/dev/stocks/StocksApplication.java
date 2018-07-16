@@ -1,11 +1,20 @@
 package com.dev.stocks;
 
 
+import com.dev.stocks.dto.JsonDto;
+import com.dev.stocks.entity.StockEntity;
+import com.dev.stocks.entity.SymbolEntity;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
 
 
 @SpringBootApplication

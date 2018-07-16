@@ -8,11 +8,12 @@ import javax.persistence.*;
 public class StockEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int stock_id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int quote_id;
 
-    @Column(name="symbol")
-    private String symbol;
+    @ManyToOne
+    @JoinColumn(name="symbol_fk", referencedColumnName = "symbol_id")
+    private SymbolEntity symbolEntity;
 
     @Column(name="price")
     private double price;
@@ -20,19 +21,20 @@ public class StockEntity {
     @Column(name="volume")
     private int volume;
 
+
     @Column(name="date")
     private String date;
+
 
     public StockEntity() {
     }
 
-
-    public int getStock_id() {
-        return stock_id;
+    public int getQuote_id() {
+        return quote_id;
     }
 
-    public void setStock_id(int stock_id) {
-        this.stock_id = stock_id;
+    public void setQuote_id(int quote_id) {
+        this.quote_id = quote_id;
     }
 
     public double getPrice() {
@@ -60,16 +62,14 @@ public class StockEntity {
     }
 
 
-    public String getSymbol() {
-        return symbol;
+    public SymbolEntity getSymbolEntity() {
+        return symbolEntity;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
+    public void setSymbolEntity(SymbolEntity symbolEntity) { this.symbolEntity= symbolEntity; }
 
-    public StockEntity(String symbol, double price, int volume, String date) {
-        this.symbol = symbol;
+    public StockEntity(SymbolEntity symbolEntity, double price, int volume, String date) {
+        this.symbolEntity=symbolEntity;
         this.price = price;
         this.volume = volume;
         this.date = date;
@@ -78,8 +78,8 @@ public class StockEntity {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("StockEntity{");
-        sb.append("stock_id=").append(stock_id);
-        sb.append(", symbol='").append(symbol).append('\'');
+        sb.append("quote_id=").append(quote_id);
+        sb.append(", symbol='").append(symbolEntity.getSymbol()).append('\'');
         sb.append(", price=").append(price);
         sb.append(", volume=").append(volume);
         sb.append(", date='").append(date).append('\'');

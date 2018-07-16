@@ -1,8 +1,11 @@
 package com.dev.stocks.controller;
 
+import com.dev.stocks.dto.JsonDto;
 import com.dev.stocks.entity.StockEntity;
+import com.dev.stocks.entity.SymbolEntity;
 import com.dev.stocks.model.StockStats;
 import com.dev.stocks.service.StockService;
+import com.dev.stocks.service.SymbolService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class StockController {
@@ -21,23 +24,36 @@ public class StockController {
     @Autowired
     private StockService stockService;
 
+    @Autowired
+    private SymbolService symbolService;
+
     @PostMapping("/load")
-    public String load() throws Exception{
+    public String load() throws Exception {
+
 
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<StockEntity>> typeReference = new TypeReference<List<StockEntity>>(){};
+        TypeReference<List<JsonDto>> stockTypeReference = new TypeReference<List<JsonDto>>() {
+        };
+        Map<String, SymbolEntity> symbolMap = new HashMap<>();
+        List<StockEntity> stockEntityList = new ArrayList<>();
         //InputStream inputStream = TypeReference.class.getResourceAsStream("/json/stocks.json");
-        URL jsonURL=new URL("https://bootcamp-training-files.cfapps.io/week2/week2-stocks.json");
-        InputStream inputStream=jsonURL.openStream();
         try {
-            List<StockEntity> stocks = mapper.readValue(inputStream,typeReference);
-            stockService.save(stocks);
-            return(stocks.size()+" stocks Saved!");
-        } catch (IOException e){
-            return "Unable to save stocks: " + e.getMessage();
+            URL jsonURL = new URL("https://bootcamp-training-files.cfapps.io/week2/week2-stocks.json");
+            InputStream inputStream = jsonURL.openStream();
+            List<JsonDto> stockDtoList = mapper.readValue(inputStream, stockTypeReference);
+            for (JsonDto stockDto : stockDtoList) {
+                if (!symbolMap.containsKey(stockDto.getSymbol()))
+                    symbolMap.put(stockDto.getSymbol(), new SymbolEntity(stockDto.getSymbol()));
+                stockEntityList.add(new StockEntity(symbolMap.get(stockDto.getSymbol()), stockDto.getPrice(), stockDto.getVolume(), stockDto.getDate()));
+            }
+        } catch (IOException e) {
+            System.out.println("Unable to save stocks: " + e.getMessage());
         }
+        symbolService.saveAll(new ArrayList<SymbolEntity>(symbolMap.values()));
+        stockService.saveAll(stockEntityList);
+        return (symbolMap.values().size() + " symbols saved! and " + stockEntityList.size() + " stocks saved!");
     }
-    @GetMapping("/{stockName}/{inputDate}")
+   @GetMapping("/{stockName}/{inputDate}")
     public String getDataByDate(@PathVariable("stockName") String stockName, @PathVariable("inputDate") String inputDate){
 
         StockStats stockStats=null;
@@ -55,6 +71,5 @@ public class StockController {
         }
         return null;
     }
-
 
 }
